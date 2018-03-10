@@ -8,8 +8,7 @@
     "deploy": "aws lambda update-function-code --function-name $CODEBUILD_PROJECT_NAME --zip-file 'fileb://package.zip'",
     "tar": "tar -zcf package.tar.gz package.json index.js lib node_modules",
     "zip": "zip -q -r package.zip package.json index.js lib node_modules",
-    "test": "./node_modules/mocha/bin/mocha",
-    "compile": "docker run codecommit-pull-request-codebuild"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "keywords": [
     "aws",

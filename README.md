@@ -4,6 +4,9 @@ A process to trigger a CodeBuild job when a CodeCommit pull request is made
 This is achieved by setting an SNS notification on the CodeCommit project,
 and subscribing the lambda to it that will start the build
 
+A status and link are commented to the pull request when the build begins,
+and a success/failure comment is added after the build
+
 ## Example
  * Add project as a CodeCommit repository
  * Create CodeBuild job using the CodeCommit repository as a source
@@ -17,7 +20,21 @@ and subscribing the lambda to it that will start the build
 
 ### Required Permissions
  * codecommit:GetPullRequest
+ * codecommit:PostComment
  * codebuild:StartBuild
+
+## CodeBuild
+
+### Environment Variables
+Supplied to the job via Lambda
+
+ * REPOSITORY_NAME
+ * PULL_REQUEST_ID
+ * BEFORE_COMMIT_ID
+ * AFTER_COMMIT_ID
+
+### Required Permissions
+ * codecommit:PostComment
 
 ## Deploying
 ```
