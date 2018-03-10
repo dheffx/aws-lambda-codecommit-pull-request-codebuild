@@ -1,0 +1,10 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - perl example.pl > artifact 
+artifacts:
+  files:
+    - artifact
+  discard-paths: yes

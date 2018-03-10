@@ -1,0 +1,29 @@
+{
+  "name": "lambda-codecommit-pull-request-codebuild",
+  "version": "0.0.1",
+  "description": "lambda for codecommit pull request triggering codebuild",
+  "repository": "https://github.com/dheffx/lambda-codecommit-pull-request-codebuild.git",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "aws lambda update-function-code --function-name $CODEBUILD_PROJECT_NAME --zip-file 'fileb://package.zip'",
+    "tar": "tar -zcf package.tar.gz package.json index.js lib node_modules",
+    "zip": "zip -q -r package.zip package.json index.js lib node_modules",
+    "test": "./node_modules/mocha/bin/mocha",
+    "compile": "docker run codecommit-pull-request-codebuild"
+  },
+  "keywords": [
+    "aws",
+    "codebuild",
+    "codecommit",
+    "lambda"
+  ],
+  "author": "Daniel Heffner",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.207.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.4"
+  }
+}
