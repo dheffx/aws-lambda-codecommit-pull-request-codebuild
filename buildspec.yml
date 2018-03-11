@@ -7,9 +7,15 @@ phases:
       - echo CODECOMMIT_PULL_REQUEST_ID $CODECOMMIT_PULL_REQUEST_ID
       - echo CODECOMMIT_SOURCE_COMMIT_ID $CODECOMMIT_SOURCE_COMMIT_ID
       - echo CODECOMMIT_DESTINATION_COMMIT_ID $CODECOMMIT_DESTINATION_COMMIT_ID
+      - echo IS_TEST_FAILURE $IS_TEST_FAILURE
   build:
     commands:
-      - perl example/build.pl > artifact
+      - |
+        if [ -z "$IS_TEST_FAILURE" ]; then
+          echo $CODEBUILD_BUILD_ID > artifact
+        else
+          exit 1
+        fi 
   post_build:
     commands:
       - |

@@ -49,7 +49,7 @@ LAMBDA_NAME=<yournamehere> npm run deploy
 
 ### Test example
 By default it should be a successful CodeBuild job
-Set an environment variable on the CodeBuild job of TEST_CASE=FAILURE in order to force it to fail
+Set an environment variable on the CodeBuild job of IS_TEST_FAILURE in order to force it to fail
 
 ### Dockerfile
 Useful for making sure the lambda compiles for nodejs 6
