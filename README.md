@@ -1,7 +1,7 @@
 # AWS Lambda for CodeCommit Pull Request to CodeBuild
 
 A process to trigger a CodeBuild job when a CodeCommit pull request is made
-This is achieved by setting an SNS notification on the CodeCommit project,
+This is achieved by setting an CloudWatch Event on the CodeCommit project for pull requests,
 and subscribing the lambda to it that will start the build
 
 A status and link are commented to the pull request when the build begins,
@@ -10,8 +10,8 @@ and a success/failure comment is added after the build
 ## Example
  * Add project as a CodeCommit repository
  * Create CodeBuild job using the CodeCommit repository as a source
- * Create SNS topic on CodeCommit repository for pull request events
- * Create a Lambda function that subscribes to the SNS topic
+ * Create CloudWatch Event topic on CodeCommit repository for pull request events
+ * Create a Lambda function that subscribes to the CloudWatch Eventtopic
  * Set the source of this project as the Lambda function
 
 ## Lambda

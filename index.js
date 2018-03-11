@@ -1,64 +1,56 @@
-'use strict';
-const assert = require('assert');
+'use strict'
 const AWS = require('aws-sdk')
 const codecommit = new AWS.CodeCommit()
 const codebuild = new AWS.CodeBuild()
-const codeCommitSNSRegex = /CodeCommit repository:.*?(?:made|updated) the following PullRequest (\d+)\./
 
 exports.handler = (event, context) => {
-    let pullRequestId = codeCommitSNSRegex.exec(event.Records[0].Sns.Message)[1]
-    assert.notEqual(pullRequestId, undefined)
-    codecommit.getPullRequest({
-      pullRequestId: pullRequestId
-    }).promise().then(pullRequestResponse => {
-      let pullRequest = pullRequestResponse.pullRequest
-      if (pullRequest.pullRequestStatus !== 'OPEN') return
-      let target = pullRequest.pullRequestTargets[0]
-      return build(pullRequest.pullRequestId, target)
-        .then(buildResponse => {
-          return postComment(pullRequest.pullRequestId, target, buildResponse.build)
-        })
-    }).catch(e => console.error(e))
+    let pullreq = event.detail
+    if (pullreq.pullRequestStatus !== 'Open') return
+    build(pullreq)
+      .then(buildResponse => {
+        return postComment(pullreq, buildResponse.build)
+      })
+      .catch(e => console.error(e))
 }
 
-function postComment(pullRequestId, target, build) {
+function postComment(pullreq, build) {
   let url = `https://console.aws.amazon.com/codebuild/home?region=${process.env.AWS_REGION}#/builds/${build.id}/view/new`
   let content = "CodeBuild: " + build.buildStatus + "\n" + url
   return codecommit.postCommentForPullRequest({
-    afterCommitId: target.destinationCommit,
-    beforeCommitId: target.sourceCommit,
+    afterCommitId: pullreq.destinationCommit,
+    beforeCommitId: pullreq.sourceCommit,
     content: content,
-    pullRequestId: pullRequestId,
-    repositoryName: target.repositoryName
-  }).promise();
+    pullRequestId: pullreq.pullRequestId,
+    repositoryName: pullreq.repositoryNames[0]
+  }).promise()
 }
 
-function build(pullRequestId, target) {
+function build(pullreq) {
   return codebuild.startBuild({
     projectName: process.env.CODEBUILD_PROJECT_NAME,
     artifactsOverride: { type: 'NO_ARTIFACTS' },
     environmentVariablesOverride: [
       {
         name: 'CODECOMMIT_REPOSITORY_NAME',
-        value: target.repositoryName,
+        value: pullreq.repositoryNames[0],
         type: 'PLAINTEXT'
       },
       {
         name: 'CODECOMMIT_PULL_REQUEST_ID',
-        value: pullRequestId,
+        value: pullreq.pullRequestId,
         type: 'PLAINTEXT'
       },
       {
         name: 'CODECOMMIT_SOURCE_COMMIT_ID',
-        value: target.sourceCommit,
+        value: pullreq.sourceCommit,
         type: 'PLAINTEXT'
       },
       {
         name: 'CODECOMMIT_DESTINATION_COMMIT_ID',
-        value: target.destinationCommit,
+        value: pullreq.destinationCommit,
         type: 'PLAINTEXT'
       }
     ],
-    sourceVersion: target.sourceCommit
+    sourceVersion: pullreq.sourceCommit
   }).promise()
 }
