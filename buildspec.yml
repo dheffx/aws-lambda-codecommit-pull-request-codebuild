@@ -3,10 +3,10 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo REPOSITORY_NAME $REPOSITORY_NAME
-      - echo PULL_REQUEST_ID $PULL_REQUEST_ID
-      - echo BEFORE_COMMIT_ID $BEFORE_COMMIT_ID
-      - echo AFTER_COMMIT_ID $AFTER_COMMIT_ID
+      - echo CODECOMMIT_REPOSITORY_NAME $CODECOMMIT_REPOSITORY_NAME
+      - echo CODECOMMIT_PULL_REQUEST_ID $CODECOMMIT_PULL_REQUEST_ID
+      - echo CODECOMMIT_SOURCE_COMMIT_ID $CODECOMMIT_SOURCE_COMMIT_ID
+      - echo CODECOMMIT_DESTINATION_COMMIT_ID $CODECOMMIT_DESTINATION_COMMIT_ID
   build:
     commands:
       - perl example/build.pl > artifact
@@ -14,11 +14,11 @@ phases:
     commands:
       - |
         if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ]; then
-          STATUS=SUCCESS; export SUCCESS;
+          BUILD_STATUS_MESSAGE="Your branch completed successfully";
         else
-          STATUS=FAILURE; export FAILURE;
+          BUILD_STATUS_MESSAGE="Your branch failed. View the CodeBuild job for details. You must resolve before the branch can be merged.";
         fi
-      - aws codecommit post-comment-for-pull-request --repository-name $REPOSITORY_NAME --pull-request-id $PULL_REQUEST_ID --before-commit-id $BEFORE_COMMIT_ID --after-commit-id $AFTER_COMMIT_ID --content "CodeBuild has completed. Your branch is in a state of $STATUS"
+      - aws codecommit post-comment-for-pull-request --repository-name $CODECOMMIT_REPOSITORY_NAME --pull-request-id $CODECOMMIT_PULL_REQUEST_ID --before-commit-id $CODECOMMIT_SOURCE_COMMIT_ID --after-commit-id $CODECOMMIT_DESTINATION_COMMIT_ID --content "CodeBuild has completed. $BUILD_STATUS_MESSAGE"
 artifacts:
   files:
     - artifact

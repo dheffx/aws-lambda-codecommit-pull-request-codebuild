@@ -1,4 +1,4 @@
-# CodeCommit Pull Request to CodeBuild
+# AWS Lambda for CodeCommit Pull Request to CodeBuild
 
 A process to trigger a CodeBuild job when a CodeCommit pull request is made
 This is achieved by setting an SNS notification on the CodeCommit project,
@@ -20,7 +20,7 @@ and a success/failure comment is added after the build
 
 ### Required Permissions
  * codecommit:GetPullRequest
- * codecommit:PostComment
+ * codecommit:PostCommentForPullRequest
  * codebuild:StartBuild
 
 ## CodeBuild
@@ -28,17 +28,16 @@ and a success/failure comment is added after the build
 ### Environment Variables
 Supplied to the job via Lambda
 
- * REPOSITORY_NAME
- * PULL_REQUEST_ID
- * BEFORE_COMMIT_ID
- * AFTER_COMMIT_ID
+ * CODECOMMIT_REPOSITORY_NAME
+ * CODECOMMIT_PULL_REQUEST_ID
+ * CODECOMMIT_SOURCE_COMMIT_ID
+ * CODECOMMIT_DESTINATION_COMMIT_ID
 
 ### Required Permissions
- * codecommit:PostComment
+ * codecommit:PostCommentForPullRequest
 
 ## Deploying
 ```
-npm test
 npm run zip
 CODEBUILD_PROJECT_NAME=<yournamehere> npm run deploy
 ```
@@ -56,7 +55,6 @@ Set an environment variable on the CodeBuild job of TEST_CASE=FAILURE in order t
 ### Dockerfile
 Useful for making sure the lambda compiles for nodejs 6
 ```
-npm run tar
 docker build -t compile-lambda .
 docker run compile-lambda
 ```
