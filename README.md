@@ -7,7 +7,7 @@ and subscribing the lambda to it that will start the build
 A status and link are commented to the pull request when the build begins,
 and a success/failure comment is added after the build
 
-## Example
+## Setup
  * Add project as a CodeCommit repository
  * Create CodeBuild job using the CodeCommit repository as a source
  * Create CloudWatch Event topic on CodeCommit repository for pull request events
@@ -19,9 +19,8 @@ and a success/failure comment is added after the build
  * CODEBUILD_PROJECT_NAME
 
 ### Required Permissions
- * codecommit:GetPullRequest
- * codecommit:PostCommentForPullRequest
  * codebuild:StartBuild
+ * codecommit:PostCommentForPullRequest
 
 ## CodeBuild
 
