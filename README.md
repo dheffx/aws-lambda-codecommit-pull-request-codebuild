@@ -39,7 +39,7 @@ Supplied to the job via Lambda
 ## Deploying
 ```
 npm run zip
-CODEBUILD_PROJECT_NAME=<yournamehere> npm run deploy
+LAMBDA_NAME=<yournamehere> npm run deploy
 ```
 
 ## Exercising it
