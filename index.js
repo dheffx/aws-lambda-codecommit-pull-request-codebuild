@@ -1,7 +1,9 @@
 'use strict'
 const buildEvent = require('./lib/build-event')
 const pullEvent = require('./lib/pull-event')
-
+/**
+  Detect which event type is received and route it to the correct handler
+*/
 exports.handler = (event, context) => {
   try {
     if (event.source === "aws.codebuild" && event['detail-type'] == "CodeBuild Build State Change") {
