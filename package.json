@@ -1,12 +1,15 @@
 {
-  "name": "lambda-codecommit-pull-request-codebuild",
+  "name": "aws-lambda-codecommit-pull-request-codebuild",
   "version": "0.0.1",
-  "description": "lambda for codecommit pull request triggering codebuild",
-  "repository": "https://github.com/dheffx/lambda-codecommit-pull-request-codebuild.git",
+  "description": "aws lambda for codecommit pull request triggering codebuild",
+  "repository": "https://github.com/dheffx/aws-lambda-codecommit-pull-request-codebuild.git",
   "main": "index.js",
   "scripts": {
-    "deploy": "aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file 'fileb://package.zip'",
-    "zip": "zip -q -r package.zip package.json index.js"
+    "clean": "rm -rf node_modules package.zip",
+    "push": "aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file 'fileb://package.zip'",
+    "setenv": "aws lambda update-function-configuration --function-name $LAMBDA_NAME --environment \"Variables={CODEBUILD_PROJECT_NAME=$CODEBUILD_PROJECT_NAME}\"",
+    "zip": "zip -q -r package.zip package.json index.js lib",
+    "deploy": "npm run zip && npm run push"
   },
   "keywords": [
     "aws",

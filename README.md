@@ -9,9 +9,10 @@ and a success/failure comment is added after the build
 
 ## Setup
  * Add project as a CodeCommit repository
- * Create CodeBuild job using the CodeCommit repository as a source
- * Create CloudWatch Event topic on CodeCommit repository for pull request events
- * Create a Lambda function that subscribes to the CloudWatch Eventtopic
+ * Create a CodeBuild project using the CodeCommit repository as a source
+ * Create a CloudWatch Event on the CodeCommit repository for pull request state change events
+ * Create a CloudWatch Event on the CodeBuild project for build state change events
+ * Create a Lambda function that subscribes to both of the CloudWatch Events
  * Set the source of this project as the Lambda function
 
 ## Lambda
@@ -23,7 +24,6 @@ and a success/failure comment is added after the build
  * codecommit:PostCommentForPullRequest
 
 ## CodeBuild
-
 ### Environment Variables
 Supplied to the job via Lambda
 
@@ -32,12 +32,8 @@ Supplied to the job via Lambda
  * CODECOMMIT_SOURCE_COMMIT_ID
  * CODECOMMIT_DESTINATION_COMMIT_ID
 
-### Required Permissions
- * codecommit:PostCommentForPullRequest
-
 ## Deploying
 ```
-npm run zip
 LAMBDA_NAME=<yournamehere> npm run deploy
 ```
 
@@ -47,7 +43,7 @@ LAMBDA_NAME=<yournamehere> npm run deploy
  * Update that branch by pushing another change to it - this should also trigger CodeBuild
  * Close a pull request - this should NOT trigger CodeBuild
 
-### Test example
+### Test buildspec example
 By default it should be a successful CodeBuild job
 Set an environment variable on the CodeBuild job of IS_TEST_FAILURE in order to force it to fail
 
