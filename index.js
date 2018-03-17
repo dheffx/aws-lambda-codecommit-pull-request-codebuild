@@ -6,16 +6,23 @@ const pullEvent = require('./lib/pull-event')
 /**
   Detect which event type is received and route it to the correct handler
 */
-exports.handler = (event) => {
-  try {
-    if (event.source === "aws.codebuild" && event['detail-type'] === "CodeBuild Build State Change") {
-      buildEvent.handle(event.detail)
-    } else if (event.source === "aws.codecommit" && event['detail-type'] === "CodeCommit Pull Request State Change") {
-      pullEvent.handle(event.detail)
-    } else {
-      console.error("unspecified event received", event.source, event["detail-type"])
-    }
-  } catch (e) {
-    console.error(e)
+exports.handler = (event, context, callback) => {
+  if (event.source === "aws.codebuild" && event['detail-type'] === "CodeBuild Build State Change") {
+    buildEvent.handle(event.detail)
+      .then(result => callback(null, result))
+      .catch(err => {
+        console.log("error on buildEvent", event, err)
+        callback(err, null)
+      })
+  } else if (event.source === "aws.codecommit" && event['detail-type'] === "CodeCommit Pull Request State Change") {
+    pullEvent.handle(event.detail)
+      .then(result => callback(null, result))
+      .catch(err => {
+        console.log("error on pullEvent", event, err)
+        callback(err, null)
+      })
+  } else {
+    console.log("unspecified event received", event)
+    callback("unspecified event received:" + event['detail-type'], null)
   }
 }

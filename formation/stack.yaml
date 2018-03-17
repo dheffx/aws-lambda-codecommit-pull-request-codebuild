@@ -1,0 +1,127 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An AWS CloudFormation template
+
+Parameters:
+
+  CodeCommitRepositoryName:
+    Description: the CodeCommit repository name
+    Type: String
+
+  CodeBuildProjectName:
+    Description: the CodeBuild project name
+    Type: String
+
+Resources:
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-pullrequest-builder"
+      Handler: index.handler
+      Role: !GetAtt [LambdaIamRole, Arn]
+      Code:
+        ZipFile:
+          exports.handler = function(event, context, cb) { return cb(null, {message:'Hello World'}); };
+      Environment:
+        Variables:
+          CODEBUILD_PROJECT_NAME: !Ref CodeBuildProjectName
+      Runtime: nodejs6.10
+
+  LambdaIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-role-lambda
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+  LambdaIamPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-lambda
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:GetLogEvents
+          - logs:PutLogEvents
+          Resource: !Sub arn:aws:logs:${AWS::Region}:*:*
+        - Effect: Allow
+          Action:
+          - codebuild:StartBuild
+          Resource: !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CodeBuildProjectName}
+        - Effect: Allow
+          Action:
+          - codecommit:PostCommentForPullRequest
+          Resource: !Sub arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${CodeCommitRepositoryName}
+      Roles:
+        - Ref: LambdaIamRole
+
+  PullRequestEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: CloudWatch Event for CodeCommit Pull Req State Change
+      EventPattern:
+        source:
+          - aws.codecommit
+        detail-type:
+          - CodeCommit Pull Request State Change
+        resources:
+          - !Sub arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${CodeCommitRepositoryName}
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt
+            - LambdaFunction
+            - Arn
+          Id: PullRequestBuilderLambda-CodeCommit
+
+  CodeBuildEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: CloudWatch Event for CodeBuild State Change
+      EventPattern:
+        source:
+          - aws.codebuild
+        detail-type:
+          - CodeBuild Build State Change
+#        resources:
+#          - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:build/${CodeBuildProjectName}:*
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt
+            - LambdaFunction
+            - Arn
+          Id: PullRequestBuilderLambda-CodeBuild
+
+  PermissionsForCodeBuildEventToInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - CodeBuildEventRule
+          - Arn
+
+  PermissionsForPullRequestEventToInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - PullRequestEventRule
+          - Arn

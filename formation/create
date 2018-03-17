@@ -1,0 +1,12 @@
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+aws cloudformation create-stack \
+      --stack-name $CLOUDFORMATION_STACK_NAME \
+      --parameters ParameterKey=CodeCommitRepositoryName,ParameterValue=$CODECOMMIT_REPOSITORY_NAME \
+                   ParameterKey=CodeBuildProjectName,ParameterValue=$CODEBUILD_PROJECT_NAME \
+      --template-body file://$DIR/stack.yaml \
+      --capabilities CAPABILITY_IAM \
+      --capabilities CAPABILITY_NAMED_IAM && \
+
+      aws cloudformation wait stack-create-complete \
+        --stack-name $CLOUDFORMATION_STACK_NAME
