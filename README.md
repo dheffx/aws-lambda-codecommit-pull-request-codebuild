@@ -7,7 +7,7 @@ and subscribing the lambda to it that will start the build
 A status and link are commented to the pull request when the build begins,
 and a success/failure comment is added after the build
 
-##TLDR
+## TLDR
 ```
 export CODEBUILD_PROJECT_NAME=my-codebuild-project
 export CODECOMMIT_REPOSITORY_NAME=my-codecommit-repo
