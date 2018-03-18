@@ -66,6 +66,8 @@ specify a specific resource, so the event triggers on any CodeBuild job.
 
 I opened this thread https://forums.aws.amazon.com/thread.jspa?threadID=276055 maybe by the time you read this there will be a solution.
 
+For the time being, the build-event handler compares the project-name against the env var for CODEBUILD_PROJECT_NAME to filter only the one specified
+
 ## Exercising it
  * Create a branch and push it to your CodeCommit repository
  * Create a pull request for that branch - this should trigger CodeBuild

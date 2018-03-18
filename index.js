@@ -9,14 +9,20 @@ const pullEvent = require('./lib/pull-event')
 exports.handler = (event, context, callback) => {
   if (event.source === "aws.codebuild" && event['detail-type'] === "CodeBuild Build State Change") {
     buildEvent.handle(event.detail)
-      .then(result => callback(null, result))
+      .then(result => {
+        console.log("pullEvent", result)
+        callback(null, result)
+      })
       .catch(err => {
         console.log("error on buildEvent", event, err)
         callback(err, null)
       })
   } else if (event.source === "aws.codecommit" && event['detail-type'] === "CodeCommit Pull Request State Change") {
     pullEvent.handle(event.detail)
-      .then(result => callback(null, result))
+      .then(result => {
+        console.log("pullEvent", result)
+        callback(null, result)
+      })
       .catch(err => {
         console.log("error on pullEvent", event, err)
         callback(err, null)
