@@ -26,7 +26,7 @@ exports.handler = (event, context, callback) => {
         callback(err, null)
       })
   } else {
-    console.log("unspecified event received", event)
-    callback("unspecified event received:" + event['detail-type'], null)
+    console.log("unsupported event received", event)
+    callback("unsupported event received:" + event['detail-type'], null)
   }
 }
