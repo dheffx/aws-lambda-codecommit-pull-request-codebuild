@@ -23,7 +23,7 @@ export CODECOMMIT_REPOSITORY_NAME=my-codecommit-repo
 export CLOUDFORMATION_STACK_NAME=my-stack-name
 ./formation/create
 
-export LAMBDA_NAME=my-stack-name-pullrequest-builder
+export LAMBDA_NAME=my-stack-name-lambda
 npm run deploy
 ```
 
