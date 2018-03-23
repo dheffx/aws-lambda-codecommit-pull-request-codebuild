@@ -12,7 +12,7 @@ On pull request, the CodeBuild job will be started, passing some environment var
 along with it that contain information about the pull request. These variables
 are then used on build state changes to post comments back to the pull request.
 
-When the he build begins, its status and link to it are commented to the pull request.
+When the build begins, its status and link to it are commented to the pull request.
 On success, a comment will be written to that includes a link to the artifact produced, if it is an S3 artifact.
 On failure, a snip of the logs from CloudWatch will be written as a comment back to the pull request.
 
