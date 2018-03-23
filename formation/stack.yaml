@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: An AWS CloudFormation template
+Description: Resources for CloudWatch Events and Lambda to run CodeBuild on CodeCommit pull requests
 
 Parameters:
 
