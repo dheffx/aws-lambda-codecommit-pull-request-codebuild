@@ -1,4 +1,4 @@
-export CODECOMMIT_REPOSITORY_NAME=codecommit-pull-request-codebuild
-export CODEBUILD_PROJECT_NAME=codecommit-pull-request-codebuild
-export CLOUDFORMATION_STACK_NAME=test-formation
-export LAMBDA_NAME=test-formation-pullrequest-builder
+export CODECOMMIT_REPOSITORY_NAME=pullreq-builder
+export CODEBUILD_PROJECT_NAME=pullreq-builder
+export CLOUDFORMATION_STACK_NAME=pullreq-builder
+export LAMBDA_NAME=$CLOUDFORMATION_STACK_NAME-lambda

@@ -1,19 +1,29 @@
 # AWS Lambda for CodeCommit Pull Request to CodeBuild
 
-A process to trigger a CodeBuild job when a CodeCommit pull request is made
-This is achieved by setting an CloudWatch Event on the CodeCommit project for pull requests,
-and subscribing the lambda to it that will start the build
+A process to trigger a CodeBuild job when a CodeCommit pull request is made.
 
-A status and link are commented to the pull request when the build begins,
-and a success/failure comment is added after the build
+This is achieved by setting an CloudWatch Events on both
+ - CodeCommit pull request state changes
+ - CodeBuild build state changes
+
+A lambda is created that subscribes to these events
+
+On pull request, the CodeBuild job will be started, passing some environment variables
+along with it that contain information about the pull request. These variables
+are then used on build state changes to post comments back to the pull request.
+
+When the he build begins, its status and link to it are commented to the pull request.
+On success, a comment will be written to that includes a link to the artifact produced, if it is an S3 artifact.
+On failure, a snip of the logs from CloudWatch will be written as a comment back to the pull request.
 
 ## TLDR
 ```
 export CODEBUILD_PROJECT_NAME=my-codebuild-project
 export CODECOMMIT_REPOSITORY_NAME=my-codecommit-repo
 export CLOUDFORMATION_STACK_NAME=my-stack-name
-export LAMBDA_NAME=my-stack-name-pullrequest-builder
 ./formation/create
+
+export LAMBDA_NAME=my-stack-name-pullrequest-builder
 npm run deploy
 ```
 
@@ -26,7 +36,6 @@ npm run deploy
 ```
 CLOUDFORMATION_STACK_NAME=my-stack-name ./formation/create
 ```
-The lambda created will be of the same name as the stack, with a suffix of "-pullrequest-builder"
 
 ### Update
 ```
@@ -58,15 +67,6 @@ Supplied to the job via Lambda
  * CODECOMMIT_PULL_REQUEST_ID
  * CODECOMMIT_SOURCE_COMMIT_ID
  * CODECOMMIT_DESTINATION_COMMIT_ID
-
-## Known issues
-
-Currently, there does not seem (that I can find) to be a way to make the CloudWatch Event for CodeBuild
-specify a specific resource, so the event triggers on any CodeBuild job.
-
-I opened this thread https://forums.aws.amazon.com/thread.jspa?threadID=276055 maybe by the time you read this there will be a solution.
-
-For the time being, the build-event handler compares the project-name against the env var for CODEBUILD_PROJECT_NAME to filter only the one specified
 
 ## Exercising it
  * Create a branch and push it to your CodeCommit repository

@@ -10,7 +10,6 @@ exports.handler = (event, context, callback) => {
   if (event.source === "aws.codebuild" && event['detail-type'] === "CodeBuild Build State Change") {
     buildEvent.handle(event.detail)
       .then(result => {
-        console.log("pullEvent", result)
         callback(null, result)
       })
       .catch(err => {
@@ -20,7 +19,6 @@ exports.handler = (event, context, callback) => {
   } else if (event.source === "aws.codecommit" && event['detail-type'] === "CodeCommit Pull Request State Change") {
     pullEvent.handle(event.detail)
       .then(result => {
-        console.log("pullEvent", result)
         callback(null, result)
       })
       .catch(err => {
