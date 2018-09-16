@@ -1,29 +1,26 @@
 {
-  "name": "aws-lambda-codecommit-pull-request-codebuild",
-  "version": "0.2.0",
+  "name": "aws-pull-request-builder",
+  "version": "1.0.0",
   "description": "aws lambda for codecommit pull request triggering codebuild",
-  "repository": "https://github.com/dheffx/aws-lambda-codecommit-pull-request-codebuild.git",
-  "main": "index.js",
   "scripts": {
-    "clean": "rm -rf node_modules package.zip",
-    "lint": "./node_modules/.bin/eslint index.js lib/",
-    "push": "aws lambda update-function-code --function-name $LAMBDA_NAME --zip-file 'fileb://package.zip'",
-    "setenv": "aws lambda update-function-configuration --function-name $LAMBDA_NAME --environment \"Variables={CODEBUILD_PROJECT_NAME=$CODEBUILD_PROJECT_NAME}\"",
-    "zip": "zip -q -r package.zip package.json index.js lib",
-    "deploy": "npm run zip && npm run push"
+    "lint": "npm run lint:lambda && npm run lint:yaml",
+    "lint:yaml": "./node_modules/yaml-lint/cli.js *.yml",
+    "lint:lambda": "./node_modules/.bin/eslint functions/"
   },
-  "keywords": [
-    "aws",
-    "codebuild",
-    "codecommit",
-    "lambda"
-  ],
   "author": "Daniel Heffner",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.207.0"
+    "aws-sdk": "^2.315.0"
   },
   "devDependencies": {
-    "eslint": "^4.18.2"
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^5.5.0",
+    "serverless-webpack": "^3.1.1",
+    "webpack": "^3.3.0",
+    "yaml-lint": "^1.2.4"
   }
 }

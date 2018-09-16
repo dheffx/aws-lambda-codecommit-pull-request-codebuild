@@ -1,0 +1,65 @@
+service:
+  name: pull-request-builder
+
+custom:
+  AWSAccountId: 1234567890
+  AWSRegion: us-east-2
+  CodeBuildProjectName: example-codebuild-project
+  CodeCommitRepositoryName: example-codecommit-repository
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  region: ${self:custom.AWSRegion}
+  runtime: nodejs8.10
+  environment:
+    CODEBUILD_PROJECT_NAME: ${self:custom.CodeBuildProjectName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+      - logs:GetLogEvents
+      Resource: arn:aws:logs:${self:custom.AWSRegion}:${self:custom.AWSAccountId}:*
+    - Effect: Allow
+      Action:
+      - codebuild:StartBuild
+      Resource: arn:aws:codebuild:${self:custom.AWSRegion}:${self:custom.AWSAccountId}:project/${self:custom.CodeBuildProjectName}
+    - Effect: Allow
+      Action:
+      - codecommit:PostCommentForPullRequest
+      Resource: arn:aws:codecommit:${self:custom.AWSRegion}:${self:custom.AWSAccountId}:${self:custom.CodeCommitRepositoryName}
+
+functions:
+  start-build:
+    handler: functions/start-build.handler
+    events:
+      - cloudwatchEvent:
+          name: ${self:service}-pull-request-state-change
+          description: CloudWatch Event for CodeCommit Pull Req State Change
+          event:
+            source:
+              - aws.codecommit
+            detail-type:
+              - CodeCommit Pull Request State Change
+            detail:
+              pullRequestStatus:
+                - Open
+            resources:
+              - arn:aws:codecommit:${self:custom.AWSRegion}:${self:custom.AWSAccountId}:${self:custom.CodeCommitRepositoryName}
+          enabled: true
+  post-comment:
+    handler: functions/post-comment.handler
+    events:
+      - cloudwatchEvent:
+          name: ${self:service}-code-build-state-change
+          description: CloudWatch Event for CodeBuild State Change
+          event:
+            source:
+              - aws.codebuild
+            detail-type:
+              - CodeBuild Build State Change
+            detail:
+              project-name:
+                - ${self:custom.CodeBuildProjectName}
+          enabled: true
